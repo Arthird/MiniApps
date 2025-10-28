@@ -2,7 +2,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import MiniApps // Наш C++ модуль
+import MiniApps
 
 Page {
     id: notePage
@@ -16,37 +16,38 @@ Page {
     ListView {
         id: listView
         anchors.fill: parent
+        anchors.topMargin: notePage.header ? notePage.header.height : 0
         clip: true
         spacing: 20
 
         model: noteManager.notes
 
         delegate: ItemDelegate {
+            width: parent.width
+            padding: 10
+
+            // Динамическая высота делегата
+            height: noteField.implicitHeight + 10
+
+            RowLayout {
                 width: parent.width
-                padding: 10
+                anchors.verticalCenter: undefined // убираем, чтобы не "сжимало"
+                spacing: 10
 
-                RowLayout {
-                    width: parent.width
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 10
-
-                // Текстовое поле для редактирования заметки
-                TextField {
+                // Текстовое поле
+                TextArea {
                     id: noteField
                     text: modelData
                     Layout.fillWidth: true
                     placeholderText: "Type your note..."
+                    wrapMode: TextEdit.Wrap
+                    implicitHeight: contentHeight + 20  // адаптируем под содержимое
 
-                    // Авто-сохранение, когда пользователь убирает фокус
                     onFocusChanged: {
                         if (!focus && text !== modelData) {
                             noteManager.editNote(index, text)
-                        }
-                    }
 
-                    onAccepted: {
-                        noteManager.editNote(index, text)
-                        notePage.focus = true
+                        }
                     }
                 }
 
@@ -54,9 +55,7 @@ Page {
                 Button {
                     text: "X"
                     flat: true
-                    onClicked: {
-                        noteManager.deleteNote(index)
-                    }
+                    onClicked: noteManager.deleteNote(index)
 
                     contentItem: Text {
                         text: parent.text
@@ -64,12 +63,11 @@ Page {
                         font.bold: true
                         font.pixelSize: 16
                     }
-                    background: Rectangle {
-                        color: "transparent"
-                    }
+                    background: Rectangle { color: "transparent" }
                 }
             }
         }
+
 
         ScrollIndicator.vertical: ScrollIndicator { }
     }
