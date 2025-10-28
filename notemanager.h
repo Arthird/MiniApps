@@ -20,6 +20,7 @@ public:
     Q_INVOKABLE void deleteNote(int index);
     Q_INVOKABLE void editNote(int index, const QString &newText);
 
+
 signals:
     // Сигнал, который сообщает QML, что список заметок изменился
     void notesChanged();
